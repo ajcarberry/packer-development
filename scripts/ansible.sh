@@ -2,7 +2,7 @@
 
 # Install Ansible repository.
 apt -y update
-apt -y install software-properties-common
+apt -y install software-properties-common python-apt
 apt-add-repository ppa:ansible/ansible
 
 # Install Ansible.

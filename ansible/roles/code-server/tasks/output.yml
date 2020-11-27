@@ -1,0 +1,16 @@
+---
+
+- name: Gather code-server config contents
+  shell:
+    cmd: 'cat ~/.config/code-server/config.yaml | grep password:'
+  become: true
+  become_user: "{{ service_owner }}"
+  register: codeserver_config
+  changed_when: false
+
+- name: code-server config contents
+  debug:
+    msg: "{{ codeserver_config.stdout }}"
+
+- name: Code-Server IP address
+  debug: var=ansible_all_ipv4_addresses

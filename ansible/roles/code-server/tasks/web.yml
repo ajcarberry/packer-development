@@ -1,0 +1,29 @@
+---
+
+- name: Install all web server dependancies
+  apt:
+    pkg:
+      - nginx
+      - certbot
+      - python-certbot-nginx
+    state: latest
+    update_cache: yes
+
+- name: Install NGINX config to host Code-Server
+  template:
+    src: code-server.j2
+    dest: /etc/nginx/sites-available/code-server
+    owner: "{{ owner_user }}"
+    group: "{{ owner_group }}"
+    mode: 0644
+  notify: Restart NGINX
+
+- name: Create a symbolic link
+  file:
+    src: /etc/nginx/sites-available/code-server
+    dest: /etc/nginx/sites-enabled/code-server
+    owner: "{{ owner_user }}"
+    group: "{{ owner_group }}"
+    state: link
+
+- meta: flush_handlers
