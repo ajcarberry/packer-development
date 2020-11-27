@@ -1,10 +1,14 @@
 ---
 
+- name: Get {{ service_owners }}s HOME dir
+  shell:
+    cmd: "eval echo ~{{ service_owner }}"
+  register: serviceowner_home
+  changed_when: false
+
 - name: Gather code-server config contents
   shell:
-    cmd: 'cat ~/.config/code-server/config.yaml | grep password:'
-  become: true
-  become_user: "{{ service_owner }}"
+    cmd: 'cat {{ serviceowner_home.stdout }}/.config/code-server/config.yaml | grep password:'
   register: codeserver_config
   changed_when: false
 
