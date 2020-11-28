@@ -4,8 +4,6 @@
   apt:
     pkg:
       - nginx
-      - certbot
-      - python-certbot-nginx
     state: latest
     update_cache: yes
 
@@ -18,7 +16,7 @@
     mode: 0644
   notify: Restart NGINX
 
-- name: Create a symbolic link
+- name: Enable Code-Server NGINX Config
   file:
     src: /etc/nginx/sites-available/code-server
     dest: /etc/nginx/sites-enabled/code-server

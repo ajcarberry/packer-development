@@ -5,7 +5,6 @@
     name: nginx
     state: restarted
 
-# Not working - "msg": "Could not find the requested service code-server@$USER
 - name: Start Code-Server
   service:
     name: 'code-server@{{ service_owner }}'

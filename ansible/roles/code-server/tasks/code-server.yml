@@ -26,7 +26,6 @@
   command: "systemctl daemon-reload"
   changed_when: false
 
-# Not working - "msg": "Could not find the requested service code-server@$USER
 - name: Enable Code-Server
   service:
     name: "code-server@{{ service_owner }}"

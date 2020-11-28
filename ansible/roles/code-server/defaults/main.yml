@@ -1,6 +1,6 @@
 ---
 
-host_name: development.carberry.io
+host_name: development.local
 
 owner_user: alfred
 owner_group: alfred
