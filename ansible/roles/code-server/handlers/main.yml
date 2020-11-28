@@ -1,0 +1,11 @@
+---
+
+- name: Restart NGINX
+  service:
+    name: nginx
+    state: restarted
+
+- name: Start Code-Server
+  service:
+    name: 'code-server@{{ service_owner }}'
+    state: started

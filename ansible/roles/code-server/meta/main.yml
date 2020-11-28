@@ -1,0 +1,23 @@
+---
+
+dependencies: []
+
+galaxy_info:
+  author: acarberry
+  description: Basic code-server configuration.
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.9.5
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - system
+    - packaging
+    - development
+    - cloud
+    - ansible
+    - automation

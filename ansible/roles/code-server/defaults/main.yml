@@ -1,0 +1,8 @@
+---
+
+host_name: development.local
+
+owner_user: alfred
+owner_group: alfred
+
+service_owner: alfred

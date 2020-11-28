@@ -1,0 +1,10 @@
+---
+
+# Install Code-Server
+- import_tasks: code-server.yml
+
+# Configure NGINX web hosting for Code-Server
+- import_tasks: web.yml
+
+# Output Code-Server config details
+- import_tasks: output.yml

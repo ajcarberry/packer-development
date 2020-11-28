@@ -1,0 +1,35 @@
+---
+
+- name: Install all Code-Server dependancies
+  apt:
+    pkg:
+      - curl
+    state: latest
+    update_cache: yes
+
+- name: Install Code-Server
+  shell:
+    cmd: "curl -fsSL https://code-server.dev/install.sh | sh"
+    creates: /usr/bin/code-server
+    warn: false
+  notify: Start Code-Server
+
+- name: Create a symbolic link
+  file:
+    src: "/usr/lib/systemd/system/code-server@.service"
+    dest: "/etc/systemd/system/default.target.wants/code-server@{{ service_owner }}.service"
+    owner: "{{ service_owner }}"
+    group: "{{ service_owner }}"
+    state: link
+
+- name: reload systemd
+  command: "systemctl daemon-reload"
+  changed_when: false
+
+- name: Enable Code-Server
+  service:
+    name: "code-server@{{ service_owner }}"
+    state: started
+    enabled: yes
+
+- meta: flush_handlers
