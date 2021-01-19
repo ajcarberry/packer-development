@@ -1,110 +1,199 @@
 {
-    "builders": [
-      {
-        "type": "virtualbox-iso",
-        "boot_command": [
-          "<esc><wait>",
-          "<esc><wait>",
-          "<enter><wait>",
-          "/install/vmlinuz<wait>",
-          " auto<wait>",
-          " console-setup/ask_detect=false<wait>",
-          " console-setup/layoutcode=us<wait>",
-          " console-setup/modelcode=pc105<wait>",
-          " debconf/frontend=noninteractive<wait>",
-          " debian-installer=en_US<wait>",
-          " fb=false<wait>",
-          " initrd=/install/initrd.gz<wait>",
-          " kbd-chooser/method=us<wait>",
-          " keyboard-configuration/layout=USA<wait>",
-          " keyboard-configuration/variant=USA<wait>",
-          " locale=en_US<wait>",
-          " netcfg/get_domain=carberry.io<wait>",
-          " netcfg/get_hostname={{ .Name }}<wait>",
-          " grub-installer/bootdev=/dev/sda<wait>",
-          " noapic<wait>",
-          " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
-          " -- <wait>",
-          "<enter><wait>"
+  "min_packer_version": "1.5.4",
+  "variables": {
+    "aws_region": "us-east-1",
+    "environment": null,
+    "source_ami_name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*",
+    "source_ami_owner": "099720109477",
+    "ssh_username": "ubuntu",
+    "build_version": null,
+    "share_with_aws_accounts": "",
+    "packer_instance_type": "t3.micro",
+    "security_group_name": "external_protected",
+    "ami_base_name": "ubuntu-development",
+    "ami_os_name_tag": "Ubuntu",
+    "ami_os_release_tag": "Bionic",
+    "ansible_extra_args": "",
+    "_build_uuid": "{{ uuid }}",
+    "build_tag": "acarberry/development"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<esc><wait>",
+        "<esc><wait>",
+        "<enter><wait>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=us<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debconf/frontend=noninteractive<wait>",
+        " debian-installer=en_US<wait>",
+        " fb=false<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=us<wait>",
+        " keyboard-configuration/layout=USA<wait>",
+        " keyboard-configuration/variant=USA<wait>",
+        " locale=en_US<wait>",
+        " netcfg/get_domain=carberry.io<wait>",
+        " netcfg/get_hostname={{ .Name }}<wait>",
+        " grub-installer/bootdev=/dev/sda<wait>",
+        " noapic<wait>",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 30720,
+      "guest_os_type": "Ubuntu_64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_urls": [
+        "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.5-server-amd64.iso"
+      ],
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996",
+      "ssh_username": "root",
+      "ssh_password": "password1",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "guest_additions_path": "VBoxGuestAdditions.iso",
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "packer-ubuntu",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "1024"
         ],
-        "boot_wait": "10s",
-        "disk_size": 30720,
-        "guest_os_type": "Ubuntu_64",
-        "headless": true,
-        "http_directory": "http",
-        "iso_urls": [
-          "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.5-server-amd64.iso"
-        ],
-        "iso_checksum_type": "sha256",
-        "iso_checksum": "8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996",
-        "ssh_username": "root",
-        "ssh_password": "password1",
-        "ssh_port": 22,
-        "ssh_wait_timeout": "10000s",
-        "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
-        "guest_additions_path": "VBoxGuestAdditions.iso",
-        "virtualbox_version_file": ".vbox_version",
-        "vm_name": "packer-ubuntu",
-        "vboxmanage": [
-          [
-            "modifyvm",
-            "{{.Name}}",
-            "--memory",
-            "1024"
-          ],
-          [
-            "modifyvm",
-            "{{.Name}}",
-            "--cpus",
-            "1"
-          ]
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "1"
         ]
+      ]
+    },
+    {
+      "type": "amazon-ebs",
+      "profile": "{{user `environment`}}",
+      "ami_name": "{{user `ami_base_name`}}-{{user `build_version`}}",
+      "instance_type": "{{user `packer_instance_type`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "{{user `source_ami_name`}}",
+          "root-device-type": "ebs"
+        },
+        "owners": ["{{user `source_ami_owner`}}"],
+        "most_recent": true
+      },
+      "ebs_optimized": true,
+      "ena_support": true,
+      "sriov_support": true,
+      "associate_public_ip_address": true,
+      "security_group_filter": {
+        "filters": {
+          "tag:Name": "{{user `security_group_name`}}"
+        }
+      },
+      "shutdown_behavior": "terminate",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ami_users": "{{user `share_with_aws_accounts`}}",
+      "subnet_filter": {
+        "filters": {
+          "tag:Extra": "build",
+          "tag:VPC": "main_vpc_{{user `environment`}}"
+        },
+        "most_free": true,
+        "random": false
+      },
+      "run_tags": {
+        "Base_AMI_Name": "{{.SourceAMIName}}",
+        "Name": "packer-build-{{user `ami_base_name`}}-{{user `build_version`}}",
+        "Environment": "{{user `environment`}}",
+        "Version": "{{user `build_version`}}",
+        "Automation": "packer",
+        "Changed-when": "{{isotime \"2006-01-02T03_04_05\"}}" 
+      },
+      "run_volume_tags": {
+        "Base_AMI_Name": "{{.SourceAMIName}}",
+        "Name": "packer-build-{{user `ami_base_name`}}-{{user `build_version`}}",
+        "Environment": "{{user `environment`}}",
+        "Version": "{{user `build_version`}}",
+        "Automation": "packer",
+        "Changed-when": "{{isotime \"2006-01-02T03_04_05\"}}" 
+      },
+      "tags": {
+        "OS": "{{user `ami_os_name_tag`}}",
+        "Release": "{{ user `ami_os_release_tag` }}",
+        "Base_AMI_Name": "{{.SourceAMIName}}",
+        "Name": "{{user `ami_base_name`}}-{{user `build_version`}}",
+        "Environment": "{{user `environment`}}",
+        "Version": "{{user `build_version`}}",
+        "Automation": "packer",
+        "Changed-when": "{{isotime \"2006-01-02T03_04_05\"}}" 
       }
-    ],
-    "provisioners": [
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/vbox.sh",
-        "only": ["virtualbox-iso"]
-      },
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/alfred.sh"
-      },
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/vagrant.sh",
-        "only": ["virtualbox-iso"]
-      },
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/setup.sh"
-      },
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/ansible.sh"
-      },
-      {
-        "type": "ansible-local",
-        "playbook_file": "ansible/development.yml",
-        "playbook_dir": "ansible/"
-      },
-      {
-        "type": "shell",
-        "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
-        "script": "scripts/cleanup.sh"
-      }
-    ],
-    "post-processors": [
-      {
-        "type": "vagrant",
-        "output": "vbox-devEnv-{{timestamp}}.box",
-        "only": ["virtualbox-iso"]
-      }
-    ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/vbox.sh",
+      "only": ["virtualbox-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/alfred.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/vagrant.sh",
+      "only": ["virtualbox-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/setup.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/development.yml",
+      "playbook_dir": "ansible/",
+      "role_paths": "ansible/roles",
+      "galaxy_file": "ansible/requirements.yml",
+      "extra_arguments": "{{user `ansible_extra_args`}}"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/cleanup.sh"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "output": "builds/{{.Provider}}-devEnv-{{timestamp}}.box",
+      "only": ["virtualbox-iso"]
+    },
+    {
+      "type": "vagrant-cloud",
+      "box_tag": "{{user `box_tag`}}",
+      "version": "{{user `version`}}",
+      "only": ["virtualbox-iso"]
+    }
+  ]
   }

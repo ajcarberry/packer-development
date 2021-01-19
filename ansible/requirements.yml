@@ -1,0 +1,4 @@
+---
+
+- src: 'git+https://github.com/ajcarberry/ansible-role-development.git'
+  name: 'ansible-role-development'

@@ -11,3 +11,4 @@ output-virtualbox-iso/*
 #######################
 Vagrantfile
 .vagrant/*
+builds/*
