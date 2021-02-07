@@ -1,14 +1,19 @@
 ######################
 ## Packer Artifacts ##
 ######################
-packer_cache/*
-output-virtualbox-iso/*
-*.log
-*.box
+packer/packer_cache/*
+packer/output-virtualbox-iso/*
+packer/*.log
+packer/*.box
+packer/.packer*
 
 #######################
 ## Vagrant Artifacts ##
 #######################
-Vagrantfile
 .vagrant/*
 builds/*
+
+#########################
+## Terraform Artifacts ##
+#########################
+terraform/.terraform*

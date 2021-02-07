@@ -176,10 +176,10 @@
     },
     {
       "extra_arguments": "{{user `ansible_extra_args`}}",
-      "galaxy_file": "ansible/requirements.yml",
-      "playbook_dir": "ansible/",
-      "playbook_file": "ansible/development.yml",
-      "role_paths": "ansible/roles",
+      "galaxy_file": "../ansible/requirements.yml",
+      "playbook_dir": "../ansible/",
+      "playbook_file": "../ansible/development.yml",
+      "role_paths": "../ansible/roles",
       "type": "ansible-local"
     },
     {
