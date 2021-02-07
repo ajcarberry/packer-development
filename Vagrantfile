@@ -1,26 +1,32 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+class Hash
+  def slice(*keep_keys)
+    h = {}
+    keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+    h
+  end unless Hash.method_defined?(:slice)
+  def except(*less_keys)
+    slice(*keys - less_keys)
+  end unless Hash.method_defined?(:except)
+end
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "../packer-development/vbox-devEnv-1605421088.box"
-  config.vm.define :devVM do |t|
+  config.vm.box = "dummy"
+
+  config.vm.provider :aws do |aws, override|
+    aws.aws_profile = "prod"
+    
+    aws.region = "us-east-1"
+    aws.ami = "ami-02ef95c6b3ae2d995"
+    aws.instance_type = "t3.medium"
+    aws.subnet_id = "subnet-08f2332b73d4ef65e"
+    aws.security_groups = "sg-0d2a2ff3feeb8a07a"
+    aws.associate_public_ip = "true"
+
+    override.ssh.username = "alfred"
+    override.ssh.private_key_path = "~/.ssh/alfred"
+
+    override.route53.hosted_zone_id = 'Z08482151BLZ8GEPWRD1P'
+    override.route53.record_set     = %w(development.prod.carberry.io. A)
+    override.ssh.insert_key         = false
   end
-
-  # Create a public network, which allows public network access via host
-  #config.vm.network "public_network", bridge: "en5: Display Ethernet"
-  config.vm.network "public_network", bridge: "en0: Wi-Fi (Wireless)"
-
-  # Provider-specific configuration
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = false
-    # Set the name of the vm created in VB
-    vb.name = "devVM"
-    # Customize the amount of memory and cpu on the VM:
-    vb.memory = 2048
-    vb.cpus = 1
-    vb.customize ["modifyvm", :id, "--vram", "128"]
-    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-  end
-
 end
