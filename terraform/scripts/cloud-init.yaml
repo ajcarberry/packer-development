@@ -1,0 +1,14 @@
+#cloud-config
+
+# Configure Certbot and enable code-server
+runcmd:
+  - sudo su alfred
+  - [ sudo, sed, -i, 's/development.local/${hostname}/g', /etc/nginx/sites-available/code-server ]
+  - sudo systemctl restart nginx
+  - [ sudo, systemctl, restart, --no-block, nginx ]
+  - sudo certbot --non-interactive --redirect --agree-tos --nginx -d ${hostname} -m ${email}
+  - [ sudo, systemctl, stop, --no-block, 'code-server@root' ]
+  - [ sudo, systemctl, disable, --no-block, 'code-server@root' ]
+  - [ sudo, systemctl, stop, --no-block, 'code-server@alfred' ]
+  - sleep 5
+  - [ sudo, systemctl, start, --no-block, 'code-server@alfred' ]

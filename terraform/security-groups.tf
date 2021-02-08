@@ -28,6 +28,39 @@ resource "aws_security_group" "sg_icmp" {
 }
 
 # =================================
+# HTTP/S only SG
+# =================================
+resource "aws_security_group" "sg_http" {
+  name        = "sg_http"
+  description = "A SG allowing only HTTP and HTTPS access"
+  vpc_id      = module.vpc_development.vpc_id
+
+  tags = {
+    Name = "http/s_only"
+    Env  = terraform.workspace
+    VPC  = module.vpc_development.vpc_name
+    Automation = "terraform"
+  }
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 80
+    to_port   = 80
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+  ingress {
+    protocol  = "tcp"
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+}
+
+# =================================
 # External Protected SG
 # =================================
 resource "aws_security_group" "sg_external_protected" {

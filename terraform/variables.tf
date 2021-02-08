@@ -1,4 +1,16 @@
 # =================================
+# Development Environemnt Variables
+# =================================
+variable "alex_hostname" {
+  description = "hostname for Alex's development environment"
+  default     = "dev-ajc.prod.carberry.io"
+}
+variable "alex_email" {
+  description = "Email for certbot config of Alex's dev environment"
+  default     = "alex.carberry@gmail.com"
+}
+
+# =================================
 # Development External IP space
 # =================================
 variable "development_external_nets" {
