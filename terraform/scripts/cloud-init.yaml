@@ -8,7 +8,8 @@ runcmd:
   - [ sudo, systemctl, restart, --no-block, nginx ]
   - sudo certbot --non-interactive --redirect --agree-tos --nginx -d ${hostname} -m ${email}
   - [ sudo, systemctl, stop, --no-block, 'code-server@root' ]
-  - [ sudo, systemctl, disable, --no-block, 'code-server@root' ]
+  - [ sudo, systemctl, disable, 'code-server@root' ]
   - [ sudo, systemctl, stop, --no-block, 'code-server@alfred' ]
   - sleep 5
+  - [ sudo, systemctl, enable, 'code-server@alfred' ]
   - [ sudo, systemctl, start, --no-block, 'code-server@alfred' ]
