@@ -9,7 +9,7 @@ resource "aws_instance" "alex_development" {
   ami               = data.aws_ami.development.id
   instance_type     = "t3.medium"
   subnet_id         = module.dmz_subnet_1.dmz_subnet_id
-  security_groups   = [
+  vpc_security_group_ids = [
       aws_security_group.sg_development_default.id,
       aws_security_group.sg_external_protected.id,
       aws_security_group.sg_http.id
